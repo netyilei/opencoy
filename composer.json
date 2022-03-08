@@ -1,0 +1,8 @@
+{
+    "name": "netyilei/opencoy",
+    "description": "test",
+    "type": "project",
+    "license": "gch",
+    "minimum-stability": "dev",
+    "require": {}
+}
