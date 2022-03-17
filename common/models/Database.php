@@ -101,7 +101,7 @@ class Database
      * @param $where
      * @return bool
      */
-    public static function exis($where): bool
+    public static function has($where): bool
     {
         return self::getDb()->has(static::tableName(), $where);
     }

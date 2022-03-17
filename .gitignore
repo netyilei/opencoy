@@ -2,3 +2,4 @@
 /public/admin/upload/*
 /vendor/*
 /common/runtime/*
+/common/conf/*
