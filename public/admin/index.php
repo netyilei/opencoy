@@ -1,7 +1,7 @@
 <?php
-define('APP_PATH', dirname(dirname(__DIR__)) . '/app/admin');
-define('SITE_NAME', $_SERVER['SERVER_NAME']);
 define('ROOT_PATH', dirname(dirname(__DIR__)));
+define('APP_PATH', ROOT_PATH . '/app/admin');
+define('SITE_NAME', $_SERVER['SERVER_NAME']);
 require_once ROOT_PATH . '/vendor/autoload.php';
 
 define('ENVIRON', 'develop');
