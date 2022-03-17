@@ -1,2 +1,2 @@
-# opencoy
-基于PHP YAF的CMS系统
+OpenCoy
+PHP yaf做核心的 cms系统

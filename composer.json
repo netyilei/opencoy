@@ -1,8 +1,14 @@
 {
-    "name": "netyilei/opencoy",
-    "description": "test",
-    "type": "project",
-    "license": "gch",
-    "minimum-stability": "dev",
-    "require": {}
+  "authors": [
+    {
+      "name": "OpenCoy",
+      "email": "827887@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=8.0.2"
+  },
+  "autoload": {
+    "psr-4": {}
+  }
 }

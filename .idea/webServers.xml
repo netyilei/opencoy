@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="e81d34b7-93b1-4094-99b9-17d7353bf202" name="opencoy" url="http://opencoy.tmm8.cn">
+        <fileTransfer rootFolder="/www/wwwroot/opencoy" accessType="SFTP" host="101.43.166.226" port="22" sshConfigId="ef2dbcff-31f2-4396-bb0d-e9ae51155e09" sshConfig="root@101.43.166.226:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="60000" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
