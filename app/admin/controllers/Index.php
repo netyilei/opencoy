@@ -61,4 +61,17 @@ class IndexController extends BaseController
 
         $this->error();
     }
+
+    public function upAvatarAction()
+    {
+        $post = $this->getRequest()->getPost();
+        if (!isset($post['avatar']) || !isset($post['avatar']))
+            $this->error('参数错误');
+
+        $re = AdminModel::update(['avatar' => $post['avatar'], 'updated_at' => time()], ['id' => $this->user['id']]);
+        if ($re)
+            $this->success();
+
+        $this->error();
+    }
 }

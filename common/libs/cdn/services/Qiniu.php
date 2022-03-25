@@ -18,6 +18,10 @@ class Qiniu extends Abstracts implements Interfaces
 
     public $bucket;
 
+    public $region;
+
+    public $useCdnDomain;
+
     /** @var  BucketManager */
     protected $client;
 
@@ -29,11 +33,15 @@ class Qiniu extends Abstracts implements Interfaces
         if (!isset($config['secretKey']) || empty($config['secretKey'])) throw new Exception("Qiniu secretKey cannot be blank");
         if (!isset($config['bucket']) || empty($config['bucket'])) throw new Exception("Cdn bucket cannot be blank");
         if (!isset($config['host']) || empty($config['host'])) throw new Exception("Cdn host cannot be blank");
+        if (!isset($config['region']) || empty($config['region'])) throw new Exception("Cdn region cannot be blank");
+        if (!isset($config['useCdnDomain'])) throw new Exception("Cdn useCdnDomain cannot be blank");
 
-        $this->accessKey = $config['accessKey'];
-        $this->secretKey = $config['secretKey'];
-        $this->bucket    = $config['bucket'];
-        $this->host      = $config['host'];
+        $this->accessKey    = $config['accessKey'];
+        $this->secretKey    = $config['secretKey'];
+        $this->bucket       = $config['bucket'];
+        $this->host         = $config['host'];
+        $this->region       = $config['region'];
+        $this->useCdnDomain = $config['useCdnDomain'];
 
         parent::init();
 
@@ -97,7 +105,9 @@ class Qiniu extends Abstracts implements Interfaces
             'host'        => $this->host,
             'expiredTime' => time() + 1800,
             'credentials' => [
-                'token' => $token
+                'useCdnDomain' => $this->useCdnDomain == 1,
+                'token'        => $token,
+                'region'       => $this->region,
             ]
         ];
     }
