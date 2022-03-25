@@ -55,7 +55,7 @@ class Upload {
      * @return bool|string
      * 文件上传
      */
-    public function post($path,$rule = [],$key = 'file',$replace = true)
+    public function post($path, $rule = [], $key = 'file', $replace = true)
     {
         if (empty($this->file)) {
             $this->file = isset($_FILES) ? $_FILES[$key] : [];
