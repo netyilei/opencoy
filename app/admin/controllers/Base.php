@@ -10,13 +10,16 @@ class BaseController extends \Yaf\Controller_Abstract
 
     public $headers;
 
+    public $actions = [
+        'index/auth/login'  => [ 'GET', 'POST' ],
+        'index/index/index' => [ 'GET', 'POST' ],
+        'index/index/test'  => [ 'GET', 'POST' ],
+        'system/admin/list' => [ 'GET', 'POST' ],
+    ];
+
     public function init()
     {
-        $module     = $this->_request->module. '/';
-        $controller = $this->_request->controller . '/';
-        $action     = $this->_request->action;
-
-        if (in_array($module . $controller . $action, [ 'Index/Auth/login', 'Index/Index/index', 'Index/Index/test', 'System/Admin/list' ]))
+        if ($this->pardon($this->_request->module, $this->_request->controller, $this->_request->action))
             return true;
 
         $this->headers = apache_request_headers();
@@ -44,5 +47,13 @@ class BaseController extends \Yaf\Controller_Abstract
     public function error(string $msg = '操作失败', int $code = -1, array $data = [])
     {
         ResponseJson::error($msg, $code, $data);
+    }
+
+    protected function pardon($module, $controller, $action)
+    {
+        $url = strtolower($module . '/' . $controller . '/' . $action);
+        if (isset($this->actions[$url]) && in_array($this->getRequest()->method, $this->actions[$url]))
+            return true;
+        return false;
     }
 }

@@ -29,7 +29,8 @@ class AuthController extends BaseController
     public function infoAction()
     {
         $uesr          = $this->user;
-        $uesr['roles'] = [ 'admin' ];
+        $uesr['roles'] = AdminAuthAssignmentModel::find('item_name', [ 'admin_id' => $this->user['id'] ]);
+
         $this->success($uesr);
     }
 
@@ -39,4 +40,5 @@ class AuthController extends BaseController
         AdminTokenModel::delete(['login_type' =>$post['login_type'],'token' => $post['token']]);
         $this->success([], '操作成功');
     }
+
 }

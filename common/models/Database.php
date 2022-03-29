@@ -35,18 +35,6 @@ class Database
         return self::getDb()->get(static::tableName(), $column, $where);
     }
 
-    /**
-     * 获取一个字段 一维数组
-     * @param $column string
-     * @param $where
-     * @return array|bool
-     */
-    public static function column(string $column, $where = null): mixed
-    {
-        $list  = self::getDb()->select(static::tableName(), $column, $where);
-        return $list ? array_column($list, $column) : false;
-    }
-
     public static function insert($data): int
     {
         self::getDb()->insert(static::tableName(), $data);

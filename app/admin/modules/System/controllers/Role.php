@@ -83,7 +83,7 @@ class RoleController extends BaseController
         if (!$name)
             $this->success([ 'status' => 0, 'msg' => '请正确填写角色名' ]);
 
-        if (AdminAuthItemModel::findOne([ 'name' => trim($name) ], [ 'name' ]))
+        if (AdminAuthItemModel::findOne([ 'name' => trim($name), 'type' => 1 ], [ 'name' ]))
             $this->success([ 'status' => 0, 'msg' => '角色名已存在' ]);
 
         $this->success([ 'status' => 1 ]);

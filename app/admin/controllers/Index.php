@@ -12,13 +12,7 @@ class IndexController extends BaseController
 
     public function testAction()
     {
-        $config = Yaf\Registry::get('config')->cdn->toArray();
-        $cdn = new Cdn($config['type'], $config[$config['type']]);
-
-        $re = $cdn->getSign();
-        echo "<pre>";
-
-        var_dump($re);
+        var_dump($this->getRequest()->method);
     }
 
     public function upProfileAction()

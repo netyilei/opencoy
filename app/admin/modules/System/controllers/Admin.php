@@ -42,7 +42,9 @@ class AdminController extends BaseController
             }
         }
 
-        $this->success([ 'list' => $list, 'total' => intval($total) ]);
+        $roles = AdminAuthItemModel::find([ 'name', 'description' ], [ 'type' => 1 ]);
+        $roles = array_column($roles, 'description', 'name');
+        $this->success([ 'list' => $list, 'total' => intval($total), 'roles' => $roles ]);
     }
 
     public function createAction()
@@ -60,10 +62,14 @@ class AdminController extends BaseController
         $data['updated_at']    = $t;
 
         $id = AdminModel::insert($data);
-        if ($id)
-            $this->success();
+        if (!$id)
+            $this->error('操作失败，请联系管理员');
 
-        $this->error('操作失败，请联系管理员');
+        if ($post['id'] != 1)
+            AdminAuthAssignmentModel::addItems($post['roles'], $id);
+
+        $this->success();
+
     }
 
     public function updateAction()
@@ -79,6 +85,10 @@ class AdminController extends BaseController
         $data['phone']      = trim($post['phone']);
         $data['avatar']     = $post['avatar'];
         $data['updated_at'] = time();
+        $post['id']         = intval($post['id']);
+
+        if ($post['id'] != 1)
+            AdminAuthAssignmentModel::addItems($post['roles'], $post['id']);
 
         if (AdminModel::update($data, [ 'id' => $post['id'] ]))
             $this->success();
@@ -96,6 +106,7 @@ class AdminController extends BaseController
 
         $user['password'] = '';
         $user['status']   = intval($user['status']);
+        $user['roles']    = AdminAuthAssignmentModel::find('item_name', [ 'admin_id' => $user['id'] ]);
 
         $this->success($user);
     }
@@ -104,16 +115,22 @@ class AdminController extends BaseController
     {
         $query = $this->getRequest()->getQuery();
         $user  = AdminModel::findOne([ 'id' => intval($query['id']) ], [ 'id', 'username', 'name', 'phone', 'avatar', 'status', 'created_at', 'updated_at' ]);
+        $roles = AdminAuthAssignmentModel::getAdminRole($user['id']);
+        if ($roles) {
+            $roles = array_column($roles, 'description');
+            $roles = implode(',', $roles);
+        }
 
         $data = [
             'id'          => [ 'label' => 'ID', 'value' => $user['id'] ],
             'username'    => [ 'label' => '用户名', 'value' => $user['username'] ],
+            'roles'       => [ 'label' => '角色', 'value' => $roles ],
             'name'        => [ 'label' => '姓名', 'value' => $user['name'] ],
             'phone'       => [ 'label' => '电话', 'value' => $user['phone'] ],
             'avatar'      => [ 'label' => '头像', 'value' => $user['avatar'] ],
             'status'      => [ 'label' => '状态', 'value' => $user['status'] == 1 ? '正常' : '停用' ],
             'create_date' => [ 'label' => '创建时间', 'value' => date('Y-m-d H:i', $user['created_at']) ],
-            'update_date' => [ 'label' => '修改时间', 'value' => date('Y-m-d H:i', $user['updated_at']) ]
+            'update_date' => [ 'label' => '修改时间', 'value' => date('Y-m-d H:i', $user['updated_at']) ],
         ];
 
         $this->success($data);
