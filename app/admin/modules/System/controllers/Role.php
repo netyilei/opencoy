@@ -23,17 +23,18 @@ class RoleController extends BaseController
         $whereArray['LIMIT'] = [ $current, $limit ];
         $total               = 0;
         $list                = AdminAuthItemModel::find([ 'name', 'description', 'created_at', 'updated_at' ], $whereArray);
-
+        $roles               = [];
         if ($list) {
             $total = AdminAuthItemModel::count($count);
 
             foreach ($list as &$item) {
                 $item['create_date'] = date('Y-m-d H:i', $item['created_at']);
                 unset($item['created_at']);
+                $roles[$item['name']] = $item['description'];
             }
         }
 
-        $this->success([ 'list' => $list, 'total' => intval($total) ]);
+        $this->success([ 'list' => $list, 'total' => intval($total), 'roles' => $roles ]);
     }
 
     public function createAction()
@@ -71,7 +72,7 @@ class RoleController extends BaseController
             'updated_at'  => time()
         ];
 
-        if (AdminAuthItemModel::update($data, [ 'name' => $old_name, 'type' => 1 ]))
+        if (AdminAuthItemChildModel::update([ 'parent' => $name ], [ 'parent' => $old_name ]) && AdminAuthItemModel::update($data, [ 'name' => $old_name, 'type' => 1 ]))
             $this->success();
 
         $this->error('操作失败，请联系管理员');
@@ -87,5 +88,75 @@ class RoleController extends BaseController
             $this->success([ 'status' => 0, 'msg' => '角色名已存在' ]);
 
         $this->success([ 'status' => 1 ]);
+    }
+
+    public function treeAction()
+    {
+        $name  = $this->getRequest()->getQuery('name');
+        $roles = AdminAuthItemChildModel::find('child', [ 'parent' => $name ]);
+        if ($roles)
+            $roles = array_column($roles, 'child', 'child');
+
+        $list = AdminAuthItemModel::find([ 'name', 'group', 'class', 'description' ], [ 'type' => 0, 'ORDER' => [ "sort" => 'DESC' ] ]);
+        $tree = [];
+
+        foreach ($list as $item) {
+            if (!isset($tree[$item['group']])) {
+                $tree[$item['group']] = [
+                    'title' => $item['group'],
+                    'value' => false,
+                    'child' => []
+                ];
+            }
+
+            if (!isset($tree[$item['group']]['child'][$item['class']])) {
+                $tree[$item['group']]['child'][$item['class']] = [
+                    'title' => $item['class'],
+                    'value' => false,
+                    'child' => []
+                ];
+            }
+
+            $roles[$item['name']] = isset($roles[$item['name']]);
+
+            $tree[$item['group']]['child'][$item['class']]['child'][$item['description']] = [
+                'title' => $item['description'],
+                'url'   => $item['name'],
+                'value' => $roles[$item['name']]
+            ];
+        }
+        $this->success([ 'tree' => $tree, 'roles' => $roles ]);
+    }
+
+    public function setPurviewAction()
+    {
+        $post = $this->getRequest()->getPost();
+
+        if (!isset($post['name']) || !$post['name'])
+            $this->error('参数错误');
+
+        $name = trim($post['name']);
+
+        AdminAuthItemChildModel::delete([ 'parent' => $name ]);
+
+        if (!$post['purviews'])
+            $this->success();
+
+        $data = [];
+        foreach ($post['purviews'] as $url) {
+            $data[] = [ 'parent' => $name, 'child' => $url ];
+        }
+        AdminAuthItemChildModel::insertMany($data);
+
+        $this->success();
+    }
+
+    public function deleteAction()
+    {
+        $name = $this->getRequest()->getQuery('name');
+        $name = trim($name);
+        AdminAuthItemChildModel::delete([ 'parent' => $name ]);
+        AdminAuthItemModel::delete([ 'name' => $name, 'type' => 1 ]);
+        $this->success();
     }
 }

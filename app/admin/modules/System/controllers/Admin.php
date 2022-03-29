@@ -99,15 +99,17 @@ class AdminController extends BaseController
     public function infoAction()
     {
         $query = $this->getRequest()->getQuery();
-        $user  = AdminModel::findOne([ 'id' => intval($query['id']) ], [ 'id', 'username', 'name', 'phone', 'avatar', 'status' ]);
+        $user = \models\Database::getDb()->get('admin',
+            ['[>]admin_auth_assignment' => ['id' => 'admin_id']],
+            ['id', 'username', 'name', 'phone', 'avatar', 'status', 'roles' => ['item_name']],
+            [ 'admin.id' => intval($query['id']) ]
+        );
 
-        if (!$user)
-            $this->error('您操作的管理员不存在');
-
-        $user['password'] = '';
-        $user['status']   = intval($user['status']);
-        $user['roles']    = AdminAuthAssignmentModel::find('item_name', [ 'admin_id' => $user['id'] ]);
-
+        foreach ($user['roles'] as $key => $v) {
+            if (!$v)
+                unset($user['roles'][$key]);
+        }
+        $user['roles'] = $user['roles'] ? array_values($user['roles']): [];
         $this->success($user);
     }
 

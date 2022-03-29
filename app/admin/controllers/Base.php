@@ -19,22 +19,33 @@ class BaseController extends \Yaf\Controller_Abstract
 
     public function init()
     {
-        if ($this->pardon($this->_request->module, $this->_request->controller, $this->_request->action))
-            return true;
+
+        $access = strtolower($this->_request->module . '/' . $this->_request->controller . '/' . $this->_request->action);
+        $pardon = false;
+        if ($this->pardon($access))
+            $pardon = true;
 
         $this->headers = apache_request_headers();
-        if (!isset($this->headers[static::HEADER_TOKEN]))
+
+        if (!$pardon && !isset($this->headers[static::HEADER_TOKEN]))
             $this->error('缺少Head参数account-token', 401);
 
-        $user = AdminTokenModel::getUser($this->headers[static::HEADER_TOKEN]);
-        if (!$user)
-            $this->error('token错误', 401);
+        $this->user = isset($this->headers[static::HEADER_TOKEN]) ? AdminTokenModel::getUser($this->headers[static::HEADER_TOKEN]) : [];
 
-        if ($user['expires_in'] <= time())
-            $this->error('token已过期', 401);
 
-        unset($user['expires_in']);
-        $this->user = $user;
+        if (!$pardon) {
+            if (!$this->user)
+                $this->error('token错误', 401);
+
+            if ($this->user['expires_in'] <= time())
+                $this->error('token已过期', 401);
+
+            unset($this->user['expires_in']);
+
+            if (!AdminModel::accessCheck($this->user['id'], $access . ':' . $this->getRequest()->method))
+                $this->error('您没有当前功能操作权限');
+        }
+
 
         return true;
     }
@@ -49,10 +60,9 @@ class BaseController extends \Yaf\Controller_Abstract
         ResponseJson::error($msg, $code, $data);
     }
 
-    protected function pardon($module, $controller, $action)
+    protected function pardon($access)
     {
-        $url = strtolower($module . '/' . $controller . '/' . $action);
-        if (isset($this->actions[$url]) && in_array($this->getRequest()->method, $this->actions[$url]))
+        if (isset($this->actions[$access]) && in_array($this->getRequest()->method, $this->actions[$access]))
             return true;
         return false;
     }

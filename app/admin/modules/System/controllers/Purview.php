@@ -24,7 +24,7 @@ class PurviewController extends BaseController
             'ORDER' => [ "group", "class" ],
             'LIMIT' => [ $current, $limit ]
         ];
-        $list       = AdminAuthItemModel::find([ 'name', 'description', 'group', 'class' ], $whereArray);
+        $list       = AdminAuthItemModel::find([ 'name', 'description', 'group', 'class', 'sort' ], $whereArray);
         $total      = AdminAuthItemModel::count($count);
 
         $group = [];
@@ -68,6 +68,7 @@ class PurviewController extends BaseController
             'description' => trim($post['description']),
             'group'       => trim($post['group']),
             'class'       => trim($post['class']),
+            'sort'        => intval($post['sort']),
             'updated_at'  => time()
         ];
 
@@ -92,6 +93,15 @@ class PurviewController extends BaseController
             $this->success();
 
         $this->error('操作失败，请联系管理员');
+    }
+
+    public function setSortAction()
+    {
+        $name = $this->getRequest()->getPost('name');
+        $sort = $this->getRequest()->getPost('sort');
+        $sort = intval($sort);
+        AdminAuthItemModel::update([ 'sort' => $sort ], [ 'name' => trim($name) ]);
+        $this->success();
     }
 
     public function verifyNameAction()
