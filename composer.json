@@ -6,10 +6,7 @@
     }
   ],
   "require": {
-    "qiniu/php-sdk": "^7.2",
-    "qcloud/cos-sdk-v5": ">=1.0",
-    "qcloud_sts/qcloud-sts-sdk": "3.0.*",
-    "aliyuncs/oss-sdk-php": "~2.0"
+    "qiniu/php-sdk": "^7.4.2"
   },
   "autoload": {
     "psr-4": {}

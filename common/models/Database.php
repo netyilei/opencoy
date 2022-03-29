@@ -1,18 +1,18 @@
 <?php
 
-
 namespace models;
-
 
 class Database
 {
     public static $db;
 
-    public static function tableName() {}
+    public static function tableName()
+    {
+    }
 
     public function __construct()
     {
-        $this->db        = \Yaf\Registry::get('db');
+        $this->db = \Yaf\Registry::get('db');
     }
 
     /**
@@ -48,7 +48,7 @@ class Database
      */
     public static function insertMany($data): int
     {
-        $data  = self::getDb()->insert(static::tableName(), $data);
+        $data = self::getDb()->insert(static::tableName(), $data);
         return $data->rowCount();
     }
 
@@ -97,7 +97,7 @@ class Database
     public static function getDb()
     {
         if (self::$db === null)
-            self::$db        = \Yaf\Registry::get('db');
+            self::$db = \Yaf\Registry::get('db');
 
         return self::$db;
     }
